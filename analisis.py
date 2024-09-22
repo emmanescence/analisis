@@ -52,11 +52,14 @@ def create_panel(ticker):
     # Precio y variaciones
     st.subheader("Precio y Variaciones")
     st.write(f"Precio actual: ${current_price:.2f}")
-    st.write(f"Variación diaria: {daily_var:.2f}%", color='green' if daily_var > 0 else 'red')
-    st.write(f"Variación semanal: {weekly_var:.2f}%", color='green' if weekly_var > 0 else 'red')
-    st.write(f"Variación mensual: {monthly_var:.2f}%", color='green' if monthly_var > 0 else 'red')
-    st.write(f"Variación YTD: {ytd_var:.2f}%", color='green' if ytd_var > 0 else 'red')
-    st.write(f"Variación anual: {annual_var:.2f}%" if annual_var is not None else "Variación anual: N/A", color='green' if (annual_var is not None and annual_var > 0) else 'red')
+    st.markdown(f"<span style='color:{'green' if daily_var > 0 else 'red'};'>Variación diaria: {daily_var:.2f}%</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{'green' if weekly_var > 0 else 'red'};'>Variación semanal: {weekly_var:.2f}%</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{'green' if monthly_var > 0 else 'red'};'>Variación mensual: {monthly_var:.2f}%</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{'green' if ytd_var > 0 else 'red'};'>Variación YTD: {ytd_var:.2f}%</span>", unsafe_allow_html=True)
+    if annual_var is not None:
+        st.markdown(f"<span style='color:{'green' if annual_var > 0 else 'red'};'>Variación anual: {annual_var:.2f}%</span>", unsafe_allow_html=True)
+    else:
+        st.write("Variación anual: N/A")
 
     # Gráfico de precios
     st.subheader("Gráfico de Precios")
@@ -69,20 +72,21 @@ def create_panel(ticker):
 
     # Análisis Fundamental
     st.subheader("Análisis Fundamental")
-    st.write(f"P/E Ratio: {pe_ratio:.2f}" if pe_ratio else "P/E Ratio: N/A", color=color_indicator(pe_ratio, 15, 25))
-    st.write(f"ROE: {roe:.2f}%" if roe else "ROE: N/A", color=color_indicator(roe, 15, 5))
-    st.write(f"EPS: {eps:.2f}" if eps else "EPS: N/A", color=color_indicator(eps, 1, 0))
-    st.write(f"Dividend Yield: {dividend_yield:.2f}%" if dividend_yield else "Dividend Yield: N/A", color=color_indicator(dividend_yield, 5, 2))
-    st.write(f"Beta: {beta:.2f}" if beta else "Beta: N/A")
-    st.write(f"Market Cap: ${market_cap:.2f}T" if market_cap else "Market Cap: N/A")
+    st.markdown(f"<span style='color:{color_indicator(pe_ratio, 15, 25)};'>P/E Ratio: {pe_ratio:.2f}</span>" if pe_ratio else "<span style='color:white;'>P/E Ratio: N/A</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color_indicator(roe, 15, 5)};'>ROE: {roe:.2f}%</span>" if roe else "<span style='color:white;'>ROE: N/A</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color_indicator(eps, 1, 0)};'>EPS: {eps:.2f}</span>" if eps else "<span style='color:white;'>EPS: N/A</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color_indicator(dividend_yield, 5, 2)};'>Dividend Yield: {dividend_yield:.2f}%</span>" if dividend_yield else "<span style='color:white;'>Dividend Yield: N/A</span>", unsafe_allow_html=True)
+    st.write(f"<span style='color:white;'>Beta: {beta:.2f}</span>" if beta else "<span style='color:white;'>Beta: N/A</span>", unsafe_allow_html=True)
+    st.write(f"<span style='color:white;'>Market Cap: ${market_cap:.2f}T</span>" if market_cap else "<span style='color:white;'>Market Cap: N/A</span>", unsafe_allow_html=True)
 
     # Volumen
     st.subheader("Volumen")
     volume_color = 'green' if current_volume > avg_volume else 'red'
-    st.write(f"Volumen: {current_volume/1e3:.0f}K", color=volume_color)  # Volumen en miles
+    st.markdown(f"<span style='color:{volume_color};'>Volumen: {current_volume/1e3:.0f}K</span>", unsafe_allow_html=True)  # Volumen en miles
     st.write(f"Volumen promedio: {avg_volume/1e3:.0f}K")  # Volumen promedio en miles
 
 # Input de usuario
 ticker = st.text_input("Ingrese el ticker (ej. GGAL.BA):", "GGAL.BA")
 if ticker:
     create_panel(ticker)
+
