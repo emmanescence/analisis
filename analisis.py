@@ -4,6 +4,24 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from matplotlib.gridspec import GridSpec
 
+# Funciones para calcular indicadores técnicos
+def RSI(series, period=14):
+    delta = series.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
+
+def SMA(series, period=50):
+    return series.rolling(window=period).mean()
+
+def MACD(series, short_window=12, long_window=26, signal_window=9):
+    short_ema = series.ewm(span=short_window, adjust=False).mean()
+    long_ema = series.ewm(span=long_window, adjust=False).mean()
+    macd_line = short_ema - long_ema
+    signal_line = macd_line.ewm(span=signal_window, adjust=False).mean()
+    return macd_line, signal_line
+
 # Función para obtener y calcular variaciones
 def get_stock_data(ticker):
     stock = yf.Ticker(ticker)
@@ -46,6 +64,12 @@ def create_panel(ticker):
     avg_volume = hist['Volume'].mean()
     current_volume = hist['Volume'][-1]
 
+    # Cálculo de indicadores técnicos
+    rsi = RSI(hist['Close'])
+    sma_50 = SMA(hist['Close'], 50)
+    sma_200 = SMA(hist['Close'], 200)
+    macd_line, signal_line = MACD(hist['Close'])
+
     # Setup Streamlit layout
     st.title(f"Panel de Análisis para {ticker}")
     
@@ -69,6 +93,13 @@ def create_panel(ticker):
     plt.xlabel("Fecha")
     plt.ylabel("Precio")
     st.pyplot(plt)
+
+    # Indicadores Técnicos
+    st.subheader("Indicadores Técnicos")
+    st.markdown(f"<span style='color:{color_indicator(rsi[-1], 70, 30)};'>RSI: {rsi[-1]:.2f}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color_indicator(current_price, sma_50[-1], sma_50[-1])};'>SMA 50: ${sma_50[-1]:.2f}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color_indicator(current_price, sma_200[-1], sma_200[-1])};'>SMA 200: ${sma_200[-1]:.2f}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color_indicator(macd_line[-1] - signal_line[-1], 0, 0)};'>MACD: {macd_line[-1]:.2f}</span>", unsafe_allow_html=True)
 
     # Análisis Fundamental
     st.subheader("Análisis Fundamental")
